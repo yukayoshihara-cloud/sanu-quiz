@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SANU 2nd Home ベンダー育成クイズ</title>
+<title>SANU 2nd Home 知識チェッククイズ</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
@@ -87,7 +87,6 @@ const ALL_QUESTIONS = [
   { id:50, category:"チェックイン・アウト", level:"応用", type:"4択", question:"RemoteLockが正常に動作しない場合の最初の対応は？", options:["鍵を壊す","スタッフに連絡して対応を仰ぐ","他のキャビンに移動してもらう","翌日まで待つ"], answer:1, explanation:"RemoteLockのトラブル時はまずスタッフに連絡し、指示を仰ぐのが正しい対応です。" },
 
   // ===== ハウスルール =====
-  // Q8・Q9を削除し、以下2問を新規追加（よくある問い合わせTop50より）
   { id:8, category:"ハウスルール", level:"基礎", type:"4択", question:"焚き火スペースの利用は何時まで可能ですか？", options:["21時まで","22時まで","マニュアルに定められた時間まで","24時まで"], answer:2, explanation:"焚き火スペースの利用可能時間はマニュアルに定められています。拠点によって異なる場合もあるため、必ずマニュアルを確認してゲストへ正確に案内しましょう。" },
   { id:9, category:"ハウスルール", level:"基礎", type:"4択", question:"チェックアウト時、使用済みのタオルはどうするようゲストへ案内しますか？", options:["洗濯機に入れておく","ベッドの上に置く","所定の場所に置く","フロントに持参する"], answer:2, explanation:"使用済みタオルはマニュアルで定められた所定の場所へ置くよう案内します。チェックアウト対応のよくある問い合わせの一つです。" },
   { id:10, category:"ハウスルール", level:"基礎", type:"4択", question:"チェックアウト時のキャビン掃除は、どこまで行う必要がありますか？", options:["プロ並みの清掃","マニュアルに定められた範囲の清掃","掃除不要","スタッフが全てやるので不要"], answer:1, explanation:"チェックアウト時の掃除はマニュアルに定められた範囲をゲストにお願いしています。プロ並みの清掃は不要です。" },
@@ -176,16 +175,29 @@ function App() {
   const [screen, setScreen] = useState("home");
   const [name, setName] = useState("");
   const [selCats, setSelCats] = useState([]);
-  const [selLevels, setSelLevels] = useState([]);
+  const [mode, setMode] = useState("random");
   const [questions, setQuestions] = useState([]);
   const [cur, setCur] = useState(0);
   const [chosen, setChosen] = useState(null);
   const [answered, setAnswered] = useState(false);
   const [results, setResults] = useState([]);
-  const [mode, setMode] = useState("random");
 
   const toggleCat = c => setSelCats(p => p.includes(c) ? p.filter(x=>x!==c) : [...p,c]);
-  const toggleLv = l => setSelLevels(p => p.includes(l) ? p.filter(x=>x!==l) : [...p,l]);
+
+  const start = () => {
+    if (!name.trim()) { alert("お名前を入力してください"); return; }
+    let f = ALL_QUESTIONS;
+    if (selCats.length) f = f.filter(q => selCats.includes(q.category));
+    if (!f.length) { alert("条件に合う問題がありません。フィルターを変更してください。"); return; }
+    let qs;
+    if (mode === "all") {
+      qs = [...f].sort((a,b) => a.id - b.id);
+    } else {
+      qs = [...f].sort(()=>Math.random()-0.5).slice(0,10);
+    }
+    setQuestions(qs); setCur(0); setChosen(null); setAnswered(false); setResults([]);
+    setScreen("quiz");
+  };
 
   const select = i => {
     if (answered) return;
@@ -198,26 +210,8 @@ function App() {
     setCur(c=>c+1); setChosen(null); setAnswered(false);
   };
 
-  const [mode, setMode] = useState("random"); // "random" or "all"
-
   const score = results.filter(r=>r.correct).length;
   const pct = questions.length ? Math.round(score/questions.length*100) : 0;
-
-  const start = () => {
-    if (!name.trim()) { alert("お名前を入力してください"); return; }
-    let f = ALL_QUESTIONS;
-    if (selCats.length) f = f.filter(q => selCats.includes(q.category));
-    if (selLevels.length) f = f.filter(q => selLevels.includes(q.level));
-    if (!f.length) { alert("条件に合う問題がありません。フィルターを変更してください。"); return; }
-    let qs;
-    if (mode === "all") {
-      qs = [...f].sort((a,b) => a.id - b.id);
-    } else {
-      qs = [...f].sort(()=>Math.random()-0.5).slice(0,10);
-    }
-    setQuestions(qs); setCur(0); setChosen(null); setAnswered(false); setResults([]);
-    setScreen("quiz");
-  };
 
   if (screen === "home") return (
     <div className="container">
@@ -247,7 +241,6 @@ function App() {
           ))}
         </div>
       </div>
-
       <button className="btn btn-primary" onClick={start}>クイズスタート 🚀</button>
       <p className="text-sm text-center mt-2">{mode==="all"?"全問出題されます（フィルターなしで75問）":"ランダムに10問出題されます"}</p>
     </div>
