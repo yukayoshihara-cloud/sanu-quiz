@@ -90,7 +90,7 @@ const ALL_QUESTIONS = [
   // Q8・Q9を削除し、以下2問を新規追加（よくある問い合わせTop50より）
   { id:8, category:"ハウスルール", level:"基礎", type:"4択", question:"焚き火スペースの利用は何時まで可能ですか？", options:["21時まで","22時まで","マニュアルに定められた時間まで","24時まで"], answer:2, explanation:"焚き火スペースの利用可能時間はマニュアルに定められています。拠点によって異なる場合もあるため、必ずマニュアルを確認してゲストへ正確に案内しましょう。" },
   { id:9, category:"ハウスルール", level:"基礎", type:"4択", question:"チェックアウト時、使用済みのタオルはどうするようゲストへ案内しますか？", options:["洗濯機に入れておく","ベッドの上に置く","所定の場所に置く","フロントに持参する"], answer:2, explanation:"使用済みタオルはマニュアルで定められた所定の場所へ置くよう案内します。チェックアウト対応のよくある問い合わせの一つです。" },
-  { id:10, category:"ハウスルール", level:"基礎", type:"穴埋め", question:"チェックアウト時、使用済みのタオルは「___」に置くよう案内する。", options:["所定の場所","ベッドの上","玄関","洗濯機の中"], answer:0, explanation:"使用済みタオルは所定の場所へ置くようマニュアルで定められています。" },
+  { id:10, category:"ハウスルール", level:"基礎", type:"4択", question:"チェックアウト時のキャビン掃除は、どこまで行う必要がありますか？", options:["プロ並みの清掃","マニュアルに定められた範囲の清掃","掃除不要","スタッフが全てやるので不要"], answer:1, explanation:"チェックアウト時の掃除はマニュアルに定められた範囲をゲストにお願いしています。プロ並みの清掃は不要です。" },
   { id:51, category:"ハウスルール", level:"基礎", type:"○×", question:"ペットの同伴は全拠点で禁止されている。", options:["○ 正しい","× 間違い"], answer:1, explanation:"ペット同伴可否は拠点によって異なります。必ず拠点ごとのルールを確認して案内してください。" },
   { id:52, category:"ハウスルール", level:"応用", type:"4択", question:"深夜に騒音クレームが来た場合の対応として正しいのは？", options:["ゲストを退去させる","ルールに従いゲストへ静粛を促す","無視する","翌朝対応する"], answer:1, explanation:"騒音クレームはルールに従い速やかにゲストへ静粛を促す対応を行います。" },
   { id:53, category:"ハウスルール", level:"基礎", type:"○×", question:"ゴミは分別してキャビン所定の場所に出すよう案内する。", options:["○ 正しい","× 間違い"], answer:0, explanation:"ゴミの分別・出し方はハウスルールで定められています。正しく案内しましょう。" },
@@ -114,7 +114,7 @@ const ALL_QUESTIONS = [
   { id:17, category:"滞在", level:"応用", type:"○×", question:"連泊の場合、ゲストが希望すれば清掃不要（スキップ）にできる。", options:["○ 正しい","× 間違い"], answer:0, explanation:"連泊時の清掃スキップはゲストが希望すれば対応可能です。" },
   { id:18, category:"滞在", level:"応用", type:"4択", question:"雪でスタック（車が動けなくなった）場合、ゲストへの最初の対応は？", options:["ゲストに自力で解決してもらう","緊急対応フローに従い案内・サポートする","予約をキャンセル処理する","翌日スタッフが対応する"], answer:1, explanation:"雪スタックは緊急対応が必要なケースです。緊急対応フローに従い迅速にサポートします。" },
   { id:35, category:"滞在", level:"基礎", type:"4択", question:"キャビンに宿泊できる最大人数について正しいのは？", options:["何人でも泊まれる","予約時に設定した人数まで","大人のみカウントする","子供は人数に含まない"], answer:1, explanation:"宿泊できる人数は予約時に設定した人数までです。超過する場合は事前に確認が必要です。" },
-  { id:36, category:"滞在", level:"応用", type:"○×", question:"照明やシーリングファンの操作方法が分からない場合、マニュアルに操作方法が記載されている。", options:["○ 正しい","× 間違い"], answer:0, explanation:"照明・ファンの操作方法はマニュアルに記載されています。まずマニュアルを確認するよう案内しましょう。" },
+  { id:36, category:"滞在", level:"基礎", type:"4択", question:"連泊中に清掃をスキップしたい場合、いつまでに連絡する必要がありますか？", options:["当日チェックイン時まで","前日の15時まで","チェックイン2日前の15時まで","1週間前まで"], answer:2, explanation:"清掃スキップの希望はチェックイン2日前の15時までに連絡が必要です。それ以降は対応できない場合があります。" },
   { id:37, category:"滞在", level:"基礎", type:"○×", question:"プロジェクターのログアウトを忘れた場合、次のゲストに影響が出る可能性がある。", options:["○ 正しい","× 間違い"], answer:0, explanation:"プロジェクターのログアウトを忘れると次のゲストがそのまま使用できてしまうため、チェックアウト時に必ず確認が必要です。" },
   { id:57, category:"滞在", level:"基礎", type:"○×", question:"滞在中の拠点周辺のゴミ拾い・環境美化活動への参加は任意である。", options:["○ 正しい","× 間違い"], answer:0, explanation:"環境美化活動への参加はゲストの任意です。ただし、SANU 2nd Homeの理念として自然環境への配慮を案内することが重要です。" },
   { id:58, category:"滞在", level:"応用", type:"4択", question:"滞在中に設備が壊れた場合、ゲストへの基本対応は？", options:["ゲストが修理費を負担する","状況を確認し所定のフローでエスカレーションする","無視する","即座に退去してもらう"], answer:1, explanation:"設備破損は所定のフローに従い状況確認・エスカレーションを行います。" },
@@ -125,7 +125,7 @@ const ALL_QUESTIONS = [
   { id:21, category:"支払い", level:"基礎", type:"4択", question:"領収書の宛名変更はどのタイミングまでに申請が必要ですか？", options:["チェックイン前","チェックアウト前","発行後7日以内","マニュアルに定められた期限内"], answer:3, explanation:"領収書の宛名変更はマニュアルに定められたルールに従って申請する必要があります。" },
   { id:44, category:"支払い", level:"基礎", type:"4択", question:"領収書の発行方法として正しいのは？", options:["フロントで直接受け取る","マイページから自分で発行する","メールで申請する","チェックイン時に受け取る"], answer:1, explanation:"領収書はマイページから自分で発行することができます。" },
   { id:45, category:"支払い", level:"応用", type:"○×", question:"NO SHOW料金はチェックイン予定日の翌日に発生する。", options:["○ 正しい","× 間違い"], answer:1, explanation:"NO SHOW料金の発生タイミングはマニュアルに定められています。正確なタイミングを確認して案内しましょう。" },
-  { id:59, category:"支払い", level:"基礎", type:"○×", question:"支払いはクレジットカードのみ対応している。", options:["○ 正しい","× 間違い"], answer:1, explanation:"支払い方法の詳細はマニュアルを確認してください。複数の支払い方法が存在する場合があります。" },
+  { id:59, category:"支払い", level:"基礎", type:"4択", question:"宿泊時の清掃料金はいくらですか？", options:["無料","¥1,100","¥3,300","¥5,500"], answer:2, explanation:"清掃料金は1滞在あたり¥3,300です。1泊でも複数泊でも1滞在分として請求されます。" },
   { id:60, category:"支払い", level:"応用", type:"4択", question:"二重請求の可能性があるとゲストから連絡があった場合の対応は？", options:["ゲストが自分でカード会社に連絡する","事実確認を行い所定フローで対応する","無視する","即座に返金処理する"], answer:1, explanation:"二重請求の疑いは事実確認を優先し、所定フローに従って対応します。" },
 
   // ===== Weekday会員 =====
@@ -136,7 +136,7 @@ const ALL_QUESTIONS = [
   { id:63, category:"Weekday会員", level:"応用", type:"4択", question:"Weekday会員の会員資格一時停止（休会）の手続きについて正しいのは？", options:["いつでも何度でも可能","マニュアルに定められた条件・期間がある","停止はできない","電話のみで受け付ける"], answer:1, explanation:"休会はマニュアルに定められた条件・期間に従って手続きする必要があります。" },
 
   // ===== Co-Owners =====
-  { id:24, category:"Co-Owners", level:"応用", type:"4択", question:"Co-Owners（共同オーナー）がハイシーズンに利用する場合の説明として正しいのは？", options:["制限なく自由に利用できる","ハイシーズンには利用制限がある","ハイシーズンは利用不可","事前申請で制限なし"], answer:1, explanation:"Co-Ownersはハイシーズンに利用制限が設けられています。" },
+  { id:24, category:"Co-Owners", level:"基礎", type:"4択", question:"Co-Ownersの予約を無料でキャンセルできるのはいつまでですか？", options:["当日まで","前日15時まで","宿泊3日前の15時まで","1週間前まで"], answer:2, explanation:"Co-Ownersの予約は宿泊3日前の15時までであれば無料でキャンセルできます。それ以降はキャンセル料が発生します。" },
   { id:25, category:"Co-Owners", level:"応用", type:"○×", question:"Co-OwnersはSANUキャビン購入に関わる費用を経費計上できる場合がある。", options:["○ 正しい","× 間違い"], answer:0, explanation:"Co-Ownersの経費計上についての問い合わせが存在します。詳細はマニュアルの該当項目を確認・案内してください。" },
   { id:64, category:"Co-Owners", level:"基礎", type:"穴埋め", question:"Co-Ownersとは、SANUキャビンを___するプログラムの参加者を指す。", options:["共同購入","レンタル","管理","宣伝"], answer:0, explanation:"Co-Ownersはキャビンを共同購入するプログラムの参加者です。" },
   { id:65, category:"Co-Owners", level:"応用", type:"○×", question:"Co-OwnersはWeekday会員と同じ予約ルールが適用される。", options:["○ 正しい","× 間違い"], answer:1, explanation:"Co-OwnersはWeekday会員とは異なる独自の予約ルールが適用されます。" },
@@ -182,20 +182,10 @@ function App() {
   const [chosen, setChosen] = useState(null);
   const [answered, setAnswered] = useState(false);
   const [results, setResults] = useState([]);
+  const [mode, setMode] = useState("random");
 
   const toggleCat = c => setSelCats(p => p.includes(c) ? p.filter(x=>x!==c) : [...p,c]);
   const toggleLv = l => setSelLevels(p => p.includes(l) ? p.filter(x=>x!==l) : [...p,l]);
-
-  const start = () => {
-    if (!name.trim()) { alert("お名前を入力してください"); return; }
-    let f = ALL_QUESTIONS;
-    if (selCats.length) f = f.filter(q => selCats.includes(q.category));
-    if (selLevels.length) f = f.filter(q => selLevels.includes(q.level));
-    if (!f.length) { alert("条件に合う問題がありません。フィルターを変更してください。"); return; }
-    const shuffled = [...f].sort(()=>Math.random()-0.5).slice(0,10);
-    setQuestions(shuffled); setCur(0); setChosen(null); setAnswered(false); setResults([]);
-    setScreen("quiz");
-  };
 
   const select = i => {
     if (answered) return;
@@ -208,20 +198,46 @@ function App() {
     setCur(c=>c+1); setChosen(null); setAnswered(false);
   };
 
+  const [mode, setMode] = useState("random"); // "random" or "all"
+
   const score = results.filter(r=>r.correct).length;
   const pct = questions.length ? Math.round(score/questions.length*100) : 0;
+
+  const start = () => {
+    if (!name.trim()) { alert("お名前を入力してください"); return; }
+    let f = ALL_QUESTIONS;
+    if (selCats.length) f = f.filter(q => selCats.includes(q.category));
+    if (selLevels.length) f = f.filter(q => selLevels.includes(q.level));
+    if (!f.length) { alert("条件に合う問題がありません。フィルターを変更してください。"); return; }
+    let qs;
+    if (mode === "all") {
+      qs = [...f].sort((a,b) => a.id - b.id);
+    } else {
+      qs = [...f].sort(()=>Math.random()-0.5).slice(0,10);
+    }
+    setQuestions(qs); setCur(0); setChosen(null); setAnswered(false); setResults([]);
+    setScreen("quiz");
+  };
 
   if (screen === "home") return (
     <div className="container">
       <div className="card text-center" style={{marginBottom:16}}>
         <span className="emoji-big">🌲</span>
         <h1>SANU 2nd Home</h1>
-        <p className="subtitle">ベンダー育成クイズ</p>
-        <p className="desc">全{ALL_QUESTIONS.length}問からランダム出題</p>
+        <p className="subtitle">知識チェッククイズ</p>
+        <p className="desc">全{ALL_QUESTIONS.length}問</p>
       </div>
       <div className="card">
         <label style={{fontWeight:700,color:"#374151",display:"block",marginBottom:8}}>👤 お名前を入力</label>
         <input className="name-input" placeholder="例：田中 太郎" value={name} onChange={e=>setName(e.target.value)} />
+      </div>
+      <div className="card">
+        <h2 style={{fontSize:15}}>📋 出題モード</h2>
+        <div style={{display:"flex",gap:8,marginBottom:4}}>
+          <button className={`filter-btn ${mode==="random"?"active":""}`} onClick={()=>setMode("random")}>🎲 ランダム10問</button>
+          <button className={`filter-btn ${mode==="all"?"active":""}`} onClick={()=>setMode("all")}>📚 全問チャレンジ</button>
+        </div>
+        <p className="text-sm" style={{marginTop:6}}>{mode==="random"?"フィルター条件からランダムに10問出題されます":"フィルター条件の全問題を順番に出題します"}</p>
       </div>
       <div className="card">
         <h2 style={{fontSize:15}}>📂 カテゴリ（空白で全て）</h2>
@@ -231,16 +247,9 @@ function App() {
           ))}
         </div>
       </div>
-      <div className="card">
-        <h2 style={{fontSize:15}}>🎯 難易度（空白で全て）</h2>
-        <div style={{display:"flex",gap:8}}>
-          {["基礎","応用"].map(l=>(
-            <button key={l} className={`filter-btn ${selLevels.includes(l)?"active":""}`} onClick={()=>toggleLv(l)}>{l==="基礎"?"🟢 基礎":"🟠 応用"}</button>
-          ))}
-        </div>
-      </div>
+
       <button className="btn btn-primary" onClick={start}>クイズスタート 🚀</button>
-      <p className="text-sm text-center mt-2">ランダムに10問出題されます</p>
+      <p className="text-sm text-center mt-2">{mode==="all"?"全問出題されます（フィルターなしで75問）":"ランダムに10問出題されます"}</p>
     </div>
   );
 
