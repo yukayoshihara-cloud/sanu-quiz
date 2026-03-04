@@ -32,6 +32,8 @@
   .btn { width: 100%; padding: 14px; border-radius: 12px; border: none; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
   .btn-primary { background: #0d9488; color: white; }
   .btn-primary:hover { background: #0f766e; }
+  .btn-secondary { background: #f3f4f6; color: #374151; margin-top: 10px; }
+  .btn-secondary:hover { background: #e5e7eb; }
   .btn-outline { background: white; color: #374151; border: 2px solid #e5e7eb; font-size: 14px; text-align: left; padding: 12px 16px; border-radius: 12px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; display: block; width: 100%; }
   .btn-outline:hover { border-color: #0d9488; }
   .btn-correct { background: #f0fdf4; border-color: #4ade80; color: #166534; }
@@ -43,8 +45,6 @@
   .explanation-correct { background: #f0fdf4; border: 1px solid #bbf7d0; }
   .explanation-wrong { background: #fef2f2; border: 1px solid #fecaca; }
   .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
-  .filter-btn { padding: 6px 14px; border-radius: 99px; font-size: 13px; font-weight: 600; border: 2px solid #e5e7eb; background: white; color: #374151; cursor: pointer; transition: all 0.2s; }
-  .filter-btn.active { background: #0d9488; color: white; border-color: #0d9488; }
   .score-circle { font-size: 56px; font-weight: 900; color: #0d9488; text-align: center; margin: 8px 0; }
   .review-item { background: white; border-radius: 12px; padding: 14px; margin-bottom: 10px; border-left: 4px solid; }
   .review-correct { border-color: #4ade80; }
@@ -57,15 +57,31 @@
   .mt-2 { margin-top: 8px; }
   .text-sm { font-size: 13px; color: #6b7280; }
   .flex-between { display: flex; justify-content: space-between; align-items: center; }
+
+  /* カテゴリーカード */
+  .cat-card { background: white; border-radius: 14px; padding: 16px 20px; margin-bottom: 12px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); display: flex; align-items: center; justify-content: space-between; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; }
+  .cat-card:hover { border-color: #0d9488; }
+  .cat-card.done { border-color: #4ade80; background: #f0fdf4; }
+  .cat-card.locked { opacity: 0.5; cursor: default; }
+  .cat-left { display: flex; align-items: center; gap: 12px; }
+  .cat-icon { font-size: 24px; }
+  .cat-name { font-weight: 700; font-size: 15px; color: #1f2937; }
+  .cat-count { font-size: 12px; color: #6b7280; margin-top: 2px; }
+  .cat-status { font-size: 22px; }
+  .mini-bar { height: 5px; background: #e5e7eb; border-radius: 99px; margin-top: 6px; overflow: hidden; width: 120px; }
+  .mini-bar-fill { height: 100%; background: #0d9488; border-radius: 99px; transition: width 0.4s; }
+  .overall-progress { background: white; border-radius: 14px; padding: 16px 20px; margin-bottom: 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+  .overall-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .overall-bar { height: 10px; background: #e5e7eb; border-radius: 99px; overflow: hidden; }
+  .overall-fill { height: 100%; background: linear-gradient(90deg, #0d9488, #22c55e); border-radius: 99px; transition: width 0.5s; }
 </style>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const { useState } = React;
+const { useState, useEffect } = React;
 
 const ALL_QUESTIONS = [
-  // ===== 予約 =====
   { id:1, category:"予約", level:"基礎", type:"4択", question:"マイページから予約できる最大先の期間として正しいものはどれですか？", options:["1ヶ月先","2ヶ月先","3ヶ月先","6ヶ月先"], answer:2, explanation:"特定拠点では3ヶ月先まで予約できない場合があります。予約可能期間は拠点により異なります。" },
   { id:2, category:"予約", level:"応用", type:"○×", question:"体調不良による急なキャンセルは、キャンセル料が発生しない。", options:["○ 正しい","× 間違い"], answer:1, explanation:"体調不良であっても通常のキャンセルポリシーが適用され、料金が発生する場合があります。" },
   { id:3, category:"予約", level:"基礎", type:"○×", question:"予約のキャンセル・変更はマイページから行うことができる。", options:["○ 正しい","× 間違い"], answer:0, explanation:"予約のキャンセル・変更はマイページから行えます。" },
@@ -75,8 +91,6 @@ const ALL_QUESTIONS = [
   { id:46, category:"予約", level:"基礎", type:"穴埋め", question:"SANU 2nd Homeの予約はスマートフォンの___から行うのが基本である。", options:["マイページ","公式サイト","電話","LINE"], answer:0, explanation:"予約・変更・キャンセルはすべてマイページから行うのが基本です。" },
   { id:47, category:"予約", level:"応用", type:"○×", question:"同じ日に複数の拠点を同時に予約することは可能である。", options:["○ 正しい","× 間違い"], answer:1, explanation:"同日に複数拠点を重複予約することはできません。一つの予約のみ有効です。" },
   { id:48, category:"予約", level:"応用", type:"4択", question:"予約変更はチェックインの何時間前まで可能ですか（原則）？", options:["6時間前","12時間前","24時間前","マニュアルに定められた期限内"], answer:3, explanation:"予約変更の期限はマニュアルに定められたルールに従います。正確な時間はマニュアルを確認してください。" },
-
-  // ===== チェックイン・アウト =====
   { id:4, category:"チェックイン・アウト", level:"基礎", type:"4択", question:"チェックインは基本的に何時から可能ですか？", options:["13時から","15時から","マニュアルに定められた時間から","12時から"], answer:1, explanation:"チェックインは基本的に15時からです。拠点によって異なる場合もあるため、必ずマニュアルを確認してゲストへ正確に案内しましょう。" },
   { id:5, category:"チェックイン・アウト", level:"基礎", type:"4択", question:"チェックアウトは基本的に何時までですか？", options:["10時まで","11時まで","12時まで","13時まで"], answer:1, explanation:"チェックアウトは基本的に11時までです。拠点によって異なる場合もあるため、正確な時間をゲストに案内できるよう確認しておきましょう。" },
   { id:6, category:"チェックイン・アウト", level:"応用", type:"4択", question:"予定より早く到着したゲストへの対応として最も適切なものはどれですか？", options:["そのままキャビンに入ってもらう","チェックイン時間まで待機するよう案内する","自動的にアーリーチェックイン扱いにする","予約をキャンセルしてもらう"], answer:1, explanation:"早着の場合はチェックイン時間まで待機いただく案内が基本です。" },
@@ -85,16 +99,12 @@ const ALL_QUESTIONS = [
   { id:30, category:"チェックイン・アウト", level:"応用", type:"○×", question:"チェックアウト後に忘れ物をした場合、すぐにキャビンに戻ることができる。", options:["○ 正しい","× 間違い"], answer:1, explanation:"チェックアウト後はキャビンの鍵が無効になるため、自由に戻ることはできません。忘れ物の対応はスタッフへの連絡が必要です。" },
   { id:49, category:"チェックイン・アウト", level:"基礎", type:"○×", question:"チェックイン時刻より前にRemoteLockでドアを開けることはできない。", options:["○ 正しい","× 間違い"], answer:0, explanation:"RemoteLockはチェックイン時刻からのみ有効になります。時刻前は解錠できません。" },
   { id:50, category:"チェックイン・アウト", level:"応用", type:"4択", question:"RemoteLockが正常に動作しない場合の最初の対応は？", options:["鍵を壊す","スタッフに連絡して対応を仰ぐ","他のキャビンに移動してもらう","翌日まで待つ"], answer:1, explanation:"RemoteLockのトラブル時はまずスタッフに連絡し、指示を仰ぐのが正しい対応です。" },
-
-  // ===== ハウスルール =====
   { id:8, category:"ハウスルール", level:"基礎", type:"4択", question:"焚き火スペースの利用は何時まで可能ですか？", options:["21時まで","22時まで","マニュアルに定められた時間まで","24時まで"], answer:2, explanation:"焚き火スペースの利用可能時間はマニュアルに定められています。拠点によって異なる場合もあるため、必ずマニュアルを確認してゲストへ正確に案内しましょう。" },
-  { id:9, category:"ハウスルール", level:"基礎", type:"4択", question:"チェックアウト時、使用済みのタオルはどうするようゲストへ案内しますか？", options:["洗濯機に入れておく","ベッドの上に置く","所定の場所に置く","フロントに持参する"], answer:2, explanation:"使用済みタオルはマニュアルで定められた所定の場所へ置くよう案内します。チェックアウト対応のよくある問い合わせの一つです。" },
+  { id:9, category:"ハウスルール", level:"基礎", type:"4択", question:"チェックアウト時、使用済みのタオルはどうするようゲストへ案内しますか？", options:["洗濯機に入れておく","ベッドの上に置く","所定の場所に置く","フロントに持参する"], answer:2, explanation:"使用済みタオルはマニュアルで定められた所定の場所へ置くよう案内します。" },
   { id:10, category:"ハウスルール", level:"基礎", type:"4択", question:"チェックアウト時のキャビン掃除は、どこまで行う必要がありますか？", options:["プロ並みの清掃","マニュアルに定められた範囲の清掃","掃除不要","スタッフが全てやるので不要"], answer:1, explanation:"チェックアウト時の掃除はマニュアルに定められた範囲をゲストにお願いしています。プロ並みの清掃は不要です。" },
   { id:51, category:"ハウスルール", level:"基礎", type:"○×", question:"ペットの同伴は全拠点で禁止されている。", options:["○ 正しい","× 間違い"], answer:1, explanation:"ペット同伴可否は拠点によって異なります。必ず拠点ごとのルールを確認して案内してください。" },
   { id:52, category:"ハウスルール", level:"応用", type:"4択", question:"深夜に騒音クレームが来た場合の対応として正しいのは？", options:["ゲストを退去させる","ルールに従いゲストへ静粛を促す","無視する","翌朝対応する"], answer:1, explanation:"騒音クレームはルールに従い速やかにゲストへ静粛を促す対応を行います。" },
   { id:53, category:"ハウスルール", level:"基礎", type:"○×", question:"ゴミは分別してキャビン所定の場所に出すよう案内する。", options:["○ 正しい","× 間違い"], answer:0, explanation:"ゴミの分別・出し方はハウスルールで定められています。正しく案内しましょう。" },
-
-  // ===== 備品・設備 =====
   { id:11, category:"備品・設備", level:"基礎", type:"○×", question:"キャビンに洗濯機または洗濯乾燥機は設置されている。", options:["○ 正しい","× 間違い"], answer:0, explanation:"洗濯機・洗濯乾燥機の有無についてはよくある問い合わせの一つです。設置されています。" },
   { id:12, category:"備品・設備", level:"応用", type:"4択", question:"サウナが使えないというお問い合わせが来た際、最初に確認すべきことは？", options:["すぐに技術者を手配する","ゲストに操作方法を確認・案内する","予約をキャンセルする","別のキャビンを提案する"], answer:1, explanation:"まず操作方法の確認・案内を行います。解決しない場合はエスカレーションします。" },
   { id:13, category:"備品・設備", level:"基礎", type:"○×", question:"調味料が不足している場合、ゲストからの要望で補充対応が可能である。", options:["○ 正しい","× 間違い"], answer:0, explanation:"調味料の補充はよくある問い合わせで、対応フローが定められています。" },
@@ -105,9 +115,7 @@ const ALL_QUESTIONS = [
   { id:34, category:"備品・設備", level:"基礎", type:"穴埋め", question:"駐車場は___台まで利用可能です（基本）。", options:["1","2","3","4"], answer:0, explanation:"基本的に駐車場は1台まで利用可能です。2台以上の場合は別途確認が必要です。" },
   { id:54, category:"備品・設備", level:"基礎", type:"○×", question:"キャビンにはドライヤーが備え付けられている。", options:["○ 正しい","× 間違い"], answer:0, explanation:"ドライヤーはキャビンの備品として設置されています。" },
   { id:55, category:"備品・設備", level:"応用", type:"4択", question:"薪が足りなくなった場合の対応として正しいのは？", options:["ゲストが自分で調達する","所定の補充フローをゲストに案内する","サービス終了として対応する","他のキャビンから持ってくる"], answer:1, explanation:"薪の補充は所定のフローに従いゲストに案内します。" },
-  { id:56, category:"備品・設備", level:"基礎", type:"○×", question:"プロジェクターはキャビンの標準備品に含まれる。", options:["○ 正しい","× 間違い"], answer:0, explanation:"プロジェクターはキャビンの標準備品として設置されています。使い方についての問い合わせに対応できるようにしましょう。" },
-
-  // ===== 滞在 =====
+  { id:56, category:"備品・設備", level:"基礎", type:"○×", question:"プロジェクターはキャビンの標準備品に含まれる。", options:["○ 正しい","× 間違い"], answer:0, explanation:"プロジェクターはキャビンの標準備品として設置されています。" },
   { id:15, category:"滞在", level:"基礎", type:"○×", question:"滞在中に友人を招くことは原則として禁止されている。", options:["○ 正しい","× 間違い"], answer:1, explanation:"友人を招くことについては条件や人数制限があります。禁止ではありません。" },
   { id:16, category:"滞在", level:"基礎", type:"4択", question:"サウナ利用時の服装ルールとして正しいのはどれですか？", options:["水着着用必須","水着不要","拠点によって異なる","タオル必須"], answer:0, explanation:"サウナ利用時は水着着用が必須です。ゲストへ正しく案内しましょう。" },
   { id:17, category:"滞在", level:"応用", type:"○×", question:"連泊の場合、ゲストが希望すれば清掃不要（スキップ）にできる。", options:["○ 正しい","× 間違い"], answer:0, explanation:"連泊時の清掃スキップはゲストが希望すれば対応可能です。" },
@@ -117,8 +125,6 @@ const ALL_QUESTIONS = [
   { id:37, category:"滞在", level:"基礎", type:"○×", question:"プロジェクターのログアウトを忘れた場合、次のゲストに影響が出る可能性がある。", options:["○ 正しい","× 間違い"], answer:0, explanation:"プロジェクターのログアウトを忘れると次のゲストがそのまま使用できてしまうため、チェックアウト時に必ず確認が必要です。" },
   { id:57, category:"滞在", level:"基礎", type:"○×", question:"滞在中の拠点周辺のゴミ拾い・環境美化活動への参加は任意である。", options:["○ 正しい","× 間違い"], answer:0, explanation:"環境美化活動への参加はゲストの任意です。ただし、SANU 2nd Homeの理念として自然環境への配慮を案内することが重要です。" },
   { id:58, category:"滞在", level:"応用", type:"4択", question:"滞在中に設備が壊れた場合、ゲストへの基本対応は？", options:["ゲストが修理費を負担する","状況を確認し所定のフローでエスカレーションする","無視する","即座に退去してもらう"], answer:1, explanation:"設備破損は所定のフローに従い状況確認・エスカレーションを行います。" },
-
-  // ===== 支払い =====
   { id:19, category:"支払い", level:"基礎", type:"穴埋め", question:"予約日に現れなかった場合に発生する料金を「___ 料金」という。", options:["NO SHOW","キャンセル","延滞","違約"], answer:0, explanation:"予約当日に無断でキャンセルまたは不泊となった場合はNO SHOW料金が発生します。" },
   { id:20, category:"支払い", level:"応用", type:"○×", question:"キャンセル料・NO SHOW料金は、特別な事情があれば必ず免除される。", options:["○ 正しい","× 間違い"], answer:1, explanation:"免除は必ずしも保証されるものではなく、ケースバイケースでの対応となります。" },
   { id:21, category:"支払い", level:"基礎", type:"4択", question:"領収書の宛名変更はどのタイミングまでに申請が必要ですか？", options:["チェックイン前","チェックアウト前","発行後7日以内","マニュアルに定められた期限内"], answer:3, explanation:"領収書の宛名変更はマニュアルに定められたルールに従って申請する必要があります。" },
@@ -126,36 +132,26 @@ const ALL_QUESTIONS = [
   { id:45, category:"支払い", level:"応用", type:"○×", question:"NO SHOW料金はチェックイン予定日の翌日に発生する。", options:["○ 正しい","× 間違い"], answer:1, explanation:"NO SHOW料金の発生タイミングはマニュアルに定められています。正確なタイミングを確認して案内しましょう。" },
   { id:59, category:"支払い", level:"基礎", type:"4択", question:"宿泊時の清掃料金はいくらですか？", options:["無料","¥1,100","¥3,300","¥5,500"], answer:2, explanation:"清掃料金は1滞在あたり¥3,300です。1泊でも複数泊でも1滞在分として請求されます。" },
   { id:60, category:"支払い", level:"応用", type:"4択", question:"二重請求の可能性があるとゲストから連絡があった場合の対応は？", options:["ゲストが自分でカード会社に連絡する","事実確認を行い所定フローで対応する","無視する","即座に返金処理する"], answer:1, explanation:"二重請求の疑いは事実確認を優先し、所定フローに従って対応します。" },
-
-  // ===== Weekday会員 =====
   { id:22, category:"Weekday会員", level:"応用", type:"穴埋め", question:"Weekday会員の「解約」と「___」は異なる手続きである。", options:["退会","キャンセル","休会","変更"], answer:0, explanation:"「解約」と「退会」は異なる概念です。ゲストへの案内時は混同しないよう注意が必要です。" },
   { id:23, category:"Weekday会員", level:"基礎", type:"○×", question:"Weekday会員は直近1週間の追加予約が可能である。", options:["○ 正しい","× 間違い"], answer:0, explanation:"Weekday会員は直近1週間の追加予約ができるという特典があります。" },
   { id:61, category:"Weekday会員", level:"基礎", type:"4択", question:"Weekday会員が利用できる曜日として正しいのは？", options:["月〜金のみ","土日のみ","全曜日","月〜木のみ"], answer:0, explanation:"Weekday会員は平日（月〜金）の利用が対象です。" },
   { id:62, category:"Weekday会員", level:"応用", type:"○×", question:"Weekday会員の月会費は利用しなくても発生する。", options:["○ 正しい","× 間違い"], answer:0, explanation:"Weekday会員の月会費は利用有無に関わらず発生します。" },
   { id:63, category:"Weekday会員", level:"応用", type:"4択", question:"Weekday会員の会員資格一時停止（休会）の手続きについて正しいのは？", options:["いつでも何度でも可能","マニュアルに定められた条件・期間がある","停止はできない","電話のみで受け付ける"], answer:1, explanation:"休会はマニュアルに定められた条件・期間に従って手続きする必要があります。" },
-
-  // ===== Co-Owners =====
   { id:24, category:"Co-Owners", level:"基礎", type:"4択", question:"Co-Ownersの予約を無料でキャンセルできるのはいつまでですか？", options:["当日まで","前日15時まで","宿泊3日前の15時まで","1週間前まで"], answer:2, explanation:"Co-Ownersの予約は宿泊3日前の15時までであれば無料でキャンセルできます。それ以降はキャンセル料が発生します。" },
   { id:25, category:"Co-Owners", level:"応用", type:"○×", question:"Co-OwnersはSANUキャビン購入に関わる費用を経費計上できる場合がある。", options:["○ 正しい","× 間違い"], answer:0, explanation:"Co-Ownersの経費計上についての問い合わせが存在します。詳細はマニュアルの該当項目を確認・案内してください。" },
   { id:64, category:"Co-Owners", level:"基礎", type:"穴埋め", question:"Co-Ownersとは、SANUキャビンを___するプログラムの参加者を指す。", options:["共同購入","レンタル","管理","宣伝"], answer:0, explanation:"Co-Ownersはキャビンを共同購入するプログラムの参加者です。" },
   { id:65, category:"Co-Owners", level:"応用", type:"○×", question:"Co-OwnersはWeekday会員と同じ予約ルールが適用される。", options:["○ 正しい","× 間違い"], answer:1, explanation:"Co-OwnersはWeekday会員とは異なる独自の予約ルールが適用されます。" },
-
-  // ===== 緊急対応 =====
   { id:38, category:"緊急対応", level:"応用", type:"4択", question:"水・お湯が出ない場合の最初の対応として正しいのは？", options:["すぐに業者を手配する","元栓・給湯器の状態を確認するよう案内する","予約をキャンセルする","別のキャビンへ移動してもらう"], answer:1, explanation:"まず元栓や給湯器の状態を確認するよう案内します。それでも解決しない場合はエスカレーションします。" },
   { id:39, category:"緊急対応", level:"基礎", type:"○×", question:"電気が使えない場合、まずブレーカーを確認するよう案内する。", options:["○ 正しい","× 間違い"], answer:0, explanation:"電気トラブルの際はまずブレーカーを確認します。それでも解決しない場合はエスカレーションします。" },
-  { id:40, category:"緊急対応", level:"応用", type:"4択", question:"薪ストーブから煙が充満している場合の対応として最優先すべきことは？", options:["換気をしてもらい安全を確保する","すぐに薪ストーブを閉める","そのまま使い続けてもらう","翌日対応する"], answer:0, explanation:"煙の充満は安全に関わるため、まず換気して安全を確保することが最優先です。その後、操作方法を確認します。" },
+  { id:40, category:"緊急対応", level:"応用", type:"4択", question:"薪ストーブから煙が充満している場合の対応として最優先すべきことは？", options:["換気をしてもらい安全を確保する","すぐに薪ストーブを閉める","そのまま使い続けてもらう","翌日対応する"], answer:0, explanation:"煙の充満は安全に関わるため、まず換気して安全を確保することが最優先です。" },
   { id:66, category:"緊急対応", level:"基礎", type:"○×", question:"ゲストが体調不良（軽症）を訴えた場合、まず近くの医療機関を案内する。", options:["○ 正しい","× 間違い"], answer:0, explanation:"体調不良の場合はまず医療機関を案内します。重篤な場合は救急への連絡を促します。" },
   { id:67, category:"緊急対応", level:"応用", type:"4択", question:"トイレが詰まった場合の最初の対応は？", options:["即座に業者を手配する","ゲストへ対処方法を案内し改善しなければエスカレーション","予約をキャンセルする","翌日対応する"], answer:1, explanation:"まずゲストへ対処方法を案内し、改善しない場合はエスカレーションします。" },
   { id:68, category:"緊急対応", level:"応用", type:"○×", question:"緊急事態が発生した場合は、スタッフへの報告より先にゲストの安全確保を優先する。", options:["○ 正しい","× 間違い"], answer:0, explanation:"いかなる緊急事態でもゲストの安全確保が最優先です。その後、速やかにスタッフへ報告します。" },
-
-  // ===== 付帯サービス =====
   { id:41, category:"付帯サービス", level:"基礎", type:"○×", question:"カーシェアサービスはSANU 2nd Homeの付帯サービスとして利用できる。", options:["○ 正しい","× 間違い"], answer:0, explanation:"カーシェアはSANU 2nd Homeの付帯サービスの一つです。利用方法についての問い合わせに対応できるようにしましょう。" },
   { id:42, category:"付帯サービス", level:"基礎", type:"4択", question:"「Stay Gift」とは何ですか？", options:["宿泊時に贈るギフト券サービス","食材のデリバリーサービス","アーリーチェックインの特典","駐車場の無料サービス"], answer:0, explanation:"Stay Giftは宿泊に関連したギフト券サービスです。料金や使い方についての問い合わせに対応できるようにしましょう。" },
-  { id:43, category:"付帯サービス", level:"応用", type:"穴埋め", question:"「One more cabin」とは、追加で___を予約できるサービスである。", options:["キャビン","食事","アクティビティ","駐車場"], answer:0, explanation:"One more cabinは追加でキャビンを予約できるサービスです。使い方についての問い合わせに正しく対応しましょう。" },
+  { id:43, category:"付帯サービス", level:"応用", type:"穴埋め", question:"「One more cabin」とは、追加で___を予約できるサービスである。", options:["キャビン","食事","アクティビティ","駐車場"], answer:0, explanation:"One more cabinは追加でキャビンを予約できるサービスです。" },
   { id:69, category:"付帯サービス", level:"基礎", type:"○×", question:"付帯サービスの利用料はすべて月会費に含まれている。", options:["○ 正しい","× 間違い"], answer:1, explanation:"付帯サービスによっては別途料金が発生するものもあります。各サービスの料金体系を確認してゲストに案内してください。" },
   { id:70, category:"付帯サービス", level:"応用", type:"4択", question:"カーシェアの車が故障した場合の対応として正しいのは？", options:["ゲストが自費で修理する","カーシェア会社の緊急連絡先へ案内する","予約をキャンセルする","翌日まで待つ"], answer:1, explanation:"カーシェアの故障時はカーシェア会社の緊急連絡先へ案内します。" },
-
-  // ===== 拠点・自然環境 =====
   { id:71, category:"拠点・自然環境", level:"基礎", type:"4択", question:"SANU 2nd Homeの拠点は主にどのようなエリアに位置していますか？", options:["都市部","自然豊かな郊外・山間・湖畔","空港周辺","繁華街"], answer:1, explanation:"SANU 2nd Homeの拠点は自然豊かなエリアに設置されています。" },
   { id:72, category:"拠点・自然環境", level:"基礎", type:"○×", question:"拠点周辺での野生動物との遭遇に備え、ゲストへ注意事項を案内することが重要である。", options:["○ 正しい","× 間違い"], answer:0, explanation:"自然環境に近い拠点では野生動物との遭遇がありえます。ゲストへの注意喚起は重要な案内の一つです。" },
   { id:73, category:"拠点・自然環境", level:"応用", type:"4択", question:"大雪・台風等の悪天候が予想される場合のゲストへの対応は？", options:["何も案内しない","事前に安全情報・注意事項を案内する","即座に予約をキャンセルする","拠点を閉鎖する"], answer:1, explanation:"悪天候が予想される場合は事前に安全情報や注意事項をゲストに案内することが重要です。" },
@@ -163,39 +159,47 @@ const ALL_QUESTIONS = [
   { id:75, category:"拠点・自然環境", level:"応用", type:"4択", question:"ゲストから「周辺のおすすめスポット」を聞かれた場合の対応は？", options:["対応範囲外として断る","拠点マニュアルや案内資料を参考に案内する","個人的な意見だけを伝える","インターネットで検索してもらう"], answer:1, explanation:"周辺スポットの案内は拠点マニュアルや案内資料を参考に行います。ゲスト体験向上に繋がる重要な対応です。" },
 ];
 
-const CAT_BADGE = {
-  "予約":"badge-blue","チェックイン・アウト":"badge-green","ハウスルール":"badge-yellow",
-  "備品・設備":"badge-orange","滞在":"badge-purple","支払い":"badge-red",
-  "Weekday会員":"badge-indigo","Co-Owners":"badge-pink","緊急対応":"badge-rose",
-  "付帯サービス":"badge-teal","拠点・自然環境":"badge-green"
-};
-const CATEGORIES = [...new Set(ALL_QUESTIONS.map(q => q.category))];
+const CAT_INFO = [
+  { name:"予約", icon:"📅", badge:"badge-blue" },
+  { name:"チェックイン・アウト", icon:"🔑", badge:"badge-green" },
+  { name:"ハウスルール", icon:"📋", badge:"badge-yellow" },
+  { name:"備品・設備", icon:"🛠️", badge:"badge-orange" },
+  { name:"滞在", icon:"🌲", badge:"badge-purple" },
+  { name:"支払い", icon:"💳", badge:"badge-red" },
+  { name:"Weekday会員", icon:"📆", badge:"badge-indigo" },
+  { name:"Co-Owners", icon:"🏠", badge:"badge-pink" },
+  { name:"緊急対応", icon:"🚨", badge:"badge-rose" },
+  { name:"付帯サービス", icon:"✨", badge:"badge-teal" },
+  { name:"拠点・自然環境", icon:"🏔️", badge:"badge-green" },
+];
 
 function App() {
   const [screen, setScreen] = useState("home");
   const [name, setName] = useState("");
-  const [selCats, setSelCats] = useState([]);
-  const [mode, setMode] = useState("random");
+  const [nameInput, setNameInput] = useState("");
+  const [currentCat, setCurrentCat] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [cur, setCur] = useState(0);
   const [chosen, setChosen] = useState(null);
   const [answered, setAnswered] = useState(false);
   const [results, setResults] = useState([]);
+  // 各カテゴリの完了状態とスコア
+  const [catProgress, setCatProgress] = useState(() => {
+    const init = {};
+    CAT_INFO.forEach(c => { init[c.name] = { done: false, score: 0, total: 0 }; });
+    return init;
+  });
 
-  const toggleCat = c => setSelCats(p => p.includes(c) ? p.filter(x=>x!==c) : [...p,c]);
+  const totalQ = ALL_QUESTIONS.length;
+  const doneCount = Object.values(catProgress).filter(v => v.done).length;
+  const totalCats = CAT_INFO.length;
+  const completedQ = Object.values(catProgress).reduce((s, v) => s + (v.done ? v.total : 0), 0);
 
-  const start = () => {
-    if (!name.trim()) { alert("お名前を入力してください"); return; }
-    let f = ALL_QUESTIONS;
-    if (selCats.length) f = f.filter(q => selCats.includes(q.category));
-    if (!f.length) { alert("条件に合う問題がありません。フィルターを変更してください。"); return; }
-    let qs;
-    if (mode === "all") {
-      qs = [...f].sort((a,b) => a.id - b.id);
-    } else {
-      qs = [...f].sort(()=>Math.random()-0.5).slice(0,10);
-    }
-    setQuestions(qs); setCur(0); setChosen(null); setAnswered(false); setResults([]);
+  const startCat = (catName) => {
+    const qs = ALL_QUESTIONS.filter(q => q.category === catName).sort((a,b) => a.id - b.id);
+    setCurrentCat(catName);
+    setQuestions(qs);
+    setCur(0); setChosen(null); setAnswered(false); setResults([]);
     setScreen("quiz");
   };
 
@@ -206,60 +210,140 @@ function App() {
   };
 
   const next = () => {
-    if (cur+1 >= questions.length) { setScreen("result"); return; }
-    setCur(c=>c+1); setChosen(null); setAnswered(false);
+    if (cur + 1 >= questions.length) {
+      setScreen("result");
+      return;
+    }
+    setCur(c => c+1); setChosen(null); setAnswered(false);
   };
 
-  const score = results.filter(r=>r.correct).length;
-  const pct = questions.length ? Math.round(score/questions.length*100) : 0;
+  const finishCat = () => {
+    const score = results.filter(r => r.correct).length;
+    setCatProgress(p => ({
+      ...p,
+      [currentCat]: { done: true, score, total: questions.length }
+    }));
+    setScreen("home");
+  };
 
-  if (screen === "home") return (
+  const retrycat = () => {
+    startCat(currentCat);
+  };
+
+  const score = results.filter(r => r.correct).length;
+  const pct = questions.length ? Math.round(score / questions.length * 100) : 0;
+
+  // ホーム：名前入力
+  if (screen === "enter") return (
     <div className="container">
-      <div className="card text-center" style={{marginBottom:16}}>
+      <div className="card text-center">
         <span className="emoji-big">🌲</span>
         <h1>SANU 2nd Home</h1>
         <p className="subtitle">知識チェッククイズ</p>
-        <p className="desc">全{ALL_QUESTIONS.length}問</p>
       </div>
       <div className="card">
         <label style={{fontWeight:700,color:"#374151",display:"block",marginBottom:8}}>👤 お名前を入力</label>
-        <input className="name-input" placeholder="例：田中 太郎" value={name} onChange={e=>setName(e.target.value)} />
+        <input className="name-input" placeholder="例：田中 太郎" value={nameInput} onChange={e=>setNameInput(e.target.value)} />
       </div>
-      <div className="card">
-        <h2 style={{fontSize:15}}>📋 出題モード</h2>
-        <div style={{display:"flex",gap:8,marginBottom:4}}>
-          <button className={`filter-btn ${mode==="random"?"active":""}`} onClick={()=>setMode("random")}>🎲 ランダム10問</button>
-          <button className={`filter-btn ${mode==="all"?"active":""}`} onClick={()=>setMode("all")}>📚 全問チャレンジ</button>
-        </div>
-        <p className="text-sm" style={{marginTop:6}}>{mode==="random"?"フィルター条件からランダムに10問出題されます":"フィルター条件の全問題を順番に出題します"}</p>
-      </div>
-      <div className="card">
-        <h2 style={{fontSize:15}}>📂 カテゴリ（空白で全て）</h2>
-        <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
-          {CATEGORIES.map(c=>(
-            <button key={c} className={`filter-btn ${selCats.includes(c)?"active":""}`} onClick={()=>toggleCat(c)}>{c}</button>
-          ))}
-        </div>
-      </div>
-      <button className="btn btn-primary" onClick={start}>クイズスタート 🚀</button>
-      <p className="text-sm text-center mt-2">{mode==="all"?"全問出題されます（フィルターなしで75問）":"ランダムに10問出題されます"}</p>
+      <button className="btn btn-primary" onClick={()=>{ if(!nameInput.trim()){alert("お名前を入力してください");return;} setName(nameInput); setScreen("home"); }}>はじめる 🚀</button>
     </div>
   );
 
+  // 名前未入力なら名前入力画面へ
+  if (screen === "home" && !name) return (
+    <div className="container">
+      <div className="card text-center">
+        <span className="emoji-big">🌲</span>
+        <h1>SANU 2nd Home</h1>
+        <p className="subtitle">知識チェッククイズ</p>
+        <p className="desc" style={{marginTop:4}}>全{totalQ}問 / {totalCats}カテゴリー</p>
+      </div>
+      <div className="card">
+        <label style={{fontWeight:700,color:"#374151",display:"block",marginBottom:8}}>👤 お名前を入力</label>
+        <input className="name-input" placeholder="例：田中 太郎" value={nameInput} onChange={e=>setNameInput(e.target.value)} />
+      </div>
+      <button className="btn btn-primary" onClick={()=>{ if(!nameInput.trim()){alert("お名前を入力してください");return;} setName(nameInput); }}>はじめる 🚀</button>
+    </div>
+  );
+
+  // カテゴリー選択ホーム
+  if (screen === "home") return (
+    <div className="container">
+      <div className="card text-center" style={{marginBottom:12}}>
+        <span className="emoji-big">🌲</span>
+        <h1>SANU 2nd Home</h1>
+        <p className="subtitle">知識チェッククイズ</p>
+        <p className="desc" style={{marginTop:4}}>こんにちは、{name}さん！</p>
+      </div>
+
+      {/* 全体進捗 */}
+      <div className="overall-progress">
+        <div className="overall-label">
+          <span style={{fontWeight:700,fontSize:14,color:"#1f2937"}}>📊 全体の進捗</span>
+          <span style={{fontWeight:700,fontSize:14,color:"#0d9488"}}>{doneCount} / {totalCats} カテゴリー完了</span>
+        </div>
+        <div className="overall-bar">
+          <div className="overall-fill" style={{width:`${totalCats ? doneCount/totalCats*100 : 0}%`}} />
+        </div>
+        <p className="text-sm" style={{marginTop:6,textAlign:"right"}}>{completedQ} / {totalQ} 問クリア済み</p>
+      </div>
+
+      {/* カテゴリーリスト */}
+      {CAT_INFO.map(c => {
+        const qs = ALL_QUESTIONS.filter(q => q.category === c.name);
+        const prog = catProgress[c.name];
+        return (
+          <div
+            key={c.name}
+            className={`cat-card ${prog.done ? "done" : ""}`}
+            onClick={() => startCat(c.name)}
+          >
+            <div className="cat-left">
+              <span className="cat-icon">{c.icon}</span>
+              <div>
+                <div className="cat-name">{c.name}</div>
+                <div className="cat-count">{qs.length}問</div>
+                {prog.done && (
+                  <div className="mini-bar">
+                    <div className="mini-bar-fill" style={{width:`${Math.round(prog.score/prog.total*100)}%`, background: prog.score/prog.total>=0.8?"#22c55e":"#facc15"}} />
+                  </div>
+                )}
+                {prog.done && <div style={{fontSize:11,color:"#6b7280",marginTop:2}}>{prog.score}/{prog.total}問正解（{Math.round(prog.score/prog.total*100)}%）</div>}
+              </div>
+            </div>
+            <span className="cat-status">{prog.done ? "✅" : "▶️"}</span>
+          </div>
+        );
+      })}
+
+      {doneCount === totalCats && (
+        <div className="card text-center" style={{background:"#f0fdf4",border:"2px solid #4ade80"}}>
+          <span style={{fontSize:36}}>🏆</span>
+          <h2 style={{color:"#166534",marginTop:8}}>全カテゴリー完了！</h2>
+          <p className="text-sm">おめでとうございます、{name}さん！全{totalQ}問を制覇しました！</p>
+        </div>
+      )}
+    </div>
+  );
+
+  // クイズ画面
   if (screen === "quiz") {
     const q = questions[cur];
+    const catInfo = CAT_INFO.find(c => c.name === currentCat) || {};
     return (
       <div className="container">
-        <div className="flex-between" style={{marginBottom:12}}>
+        <div className="flex-between" style={{marginBottom:8}}>
+          <span style={{fontWeight:700,fontSize:13,color:"#0d9488"}}>{catInfo.icon} {currentCat}</span>
           <span className="text-sm">{cur+1} / {questions.length}</span>
-          <div className="tag-row" style={{margin:0}}>
-            <span className={`badge ${CAT_BADGE[q.category]||"badge-gray"}`}>{q.category}</span>
+        </div>
+        <div className="progress-bar"><div className="progress-fill" style={{width:`${(cur+1)/questions.length*100}%`}} /></div>
+        <div className="card">
+          <div style={{display:"flex",gap:6,marginBottom:10}}>
             <span className={`badge ${q.level==="基礎"?"badge-gray":"badge-amber"}`}>{q.level}</span>
             <span className="badge badge-gray">{q.type}</span>
           </div>
+          <p style={{fontSize:17,fontWeight:600,lineHeight:1.6,color:"#111827"}}>{q.question}</p>
         </div>
-        <div className="progress-bar"><div className="progress-fill" style={{width:`${(cur+1)/questions.length*100}%`}} /></div>
-        <div className="card"><p style={{fontSize:17,fontWeight:600,lineHeight:1.6,color:"#111827"}}>{q.question}</p></div>
         <div>
           {q.options.map((opt,i)=>{
             let cls = "btn-outline";
@@ -292,6 +376,7 @@ function App() {
     );
   }
 
+  // 結果画面
   if (screen === "result") {
     const emoji = pct===100?"🏆":pct>=80?"🌟":pct>=60?"📚":"💡";
     const msg = pct===100?"完璧です！":pct>=80?"素晴らしい！":pct>=60?"もう少し！":"復習しましょう！";
@@ -299,7 +384,7 @@ function App() {
       <div className="container">
         <div className="card text-center">
           <span className="emoji-big">{emoji}</span>
-          <h2>{name}さん、{msg}</h2>
+          <h2>{currentCat} — {msg}</h2>
           <div className="score-circle">{score}<span style={{fontSize:24,color:"#9ca3af"}}> / {questions.length}</span></div>
           <div style={{background:"#e5e7eb",borderRadius:99,height:12,overflow:"hidden",margin:"8px 0"}}>
             <div style={{height:"100%",borderRadius:99,background:pct>=80?"#22c55e":pct>=60?"#facc15":"#f87171",width:`${pct}%`,transition:"width 0.5s"}} />
@@ -318,9 +403,8 @@ function App() {
             </div>
           </div>
         ))}
-        <button className="btn btn-primary mt-4" onClick={()=>{setScreen("home");setResults([]);}}>
-          もう一度挑戦する 🔄
-        </button>
+        <button className="btn btn-primary mt-4" onClick={finishCat}>カテゴリー一覧に戻る 📚</button>
+        <button className="btn btn-secondary" onClick={retrycat}>このカテゴリーをもう一度 🔄</button>
       </div>
     );
   }
